@@ -1,0 +1,48 @@
+{% extends 'base.html'%}
+
+{% block title %}
+Main page
+{% endblock %}
+
+
+{% block login %}
+<li class="nav-item"><a href="/login" class="nav-link link-light px-2">Log-in</a></li>
+{% endblock %}
+
+{% block body %}
+<div class='ps-5 mb-4 mt-5'>
+    <h3>Most popular movies > </h3>
+</div>
+
+<div class="row justify-content-center">
+    {% for movie in most_popular_movies %}
+    <div class="card" style="width: 15.5rem">
+<!--        <img src="#" class="card-img-top mt-1" alt="image">-->
+        <div class="card-body">
+            <h5 class="card-title">{{movie[1]}}</h5>
+            <p class="card-text">Release date: <i>{{movie[2]}}</i></p>
+            <a href={{movie[3]}} class="btn btn-outline-success">Go to film</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div class='ps-5 mb-4 mt-5'>
+    <h3>Most rated movies > </h3>
+</div>
+
+<div class="row justify-content-center">
+    {% for movie in most_rated_movies %}
+    <div class="card" style="width: 15.5rem">
+        <!--        <img src="static\images\5.webp" class="card-img-top mt-1" alt="image">-->
+        <div class="card-body">
+            <h5 class="card-title">{{movie[1]}}</h5>
+            <p class="card-text">Release date: <i>{{movie[2]}}</i></p>
+            <a href={{movie[3]}} class="btn btn-outline-success">Go to film</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
