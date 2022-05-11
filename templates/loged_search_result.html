@@ -1,0 +1,61 @@
+{% extends 'base.html'%}
+
+{% block title %}
+Search results
+{% endblock %}
+
+
+{% block main %}
+<li class="nav-item"><a href="/main" class="nav-link link-light px-4 active" aria-current="page">Main</a>
+</li>
+{% endblock %}
+
+
+{% block login %}
+<li class="nav-item"><a href="#" class="nav-link link-light px-2">User_{{user_id}}</a></li>
+<div class="dropdown text-end">
+    <a href="#" class="d-block link-light text-decoration-none dropdown-toggle pt-2" id="dropdownUser1"
+       data-bs-toggle="dropdown" aria-expanded="false">
+    </a>
+    <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+        <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+        <li><a class="dropdown-item" href="/rated_films">Rated films</a></li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li><a class="dropdown-item" href="/">Sign out</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block personal_recs%}
+<li class="nav-item"><a href="/pers_recs" class="nav-link link-light px-4">Personal recommendations</a></li>
+{% endblock %}
+
+{% block body %}
+<div class='container ps-5 mb-4 mt-5'>
+    <h3>Found movies: </h3>
+</div>
+
+<div class="container mt-5">
+    {% if films|length!=0 %}
+    {% for movie in films %}
+    <div class="alert alert-secondary">
+        <form>
+            <h4>{{movie[0]}}</h4>
+            <input type="hidden" name="title" value='{{movie[2]}}'>
+            <p>Release date: <i>{{movie[1]}}</i></p>
+            <div>
+                <a href={{movie[2]}} class="btn btn-success">Go to film</a>
+                <!--                <input class="btn btn-outline-white ms-3" name="btn" value="Add to wishlist"/>-->
+                <!--                <a class="btn btn-outline-white ms-3" href="/search_result">Add to wishlist</a>-->
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+    {% else %}
+    <h6>Sorry, we find no movies with this title :( </h6>
+    {% endif %}
+</div>
+
+{% endblock %}
