@@ -1,13 +1,12 @@
+import pickle
 from copy import deepcopy
 
-import pandas as pd
 import numpy as np
-import pickle
-from datetime import datetime
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import NMF
+import pandas as pd
 from annoy import AnnoyIndex
+from sklearn.decomposition import NMF
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import MinMaxScaler
 
 
 def evaluation(prediction_df):
@@ -90,9 +89,10 @@ class CollaborativeFilteringModel(BaseModel):
         return test_df_copy
 
     def top_n(self, user, n=10):
-        # todo exclude films, which user have already rated
-        df = pd.DataFrame({'user_id': [user] * len(self.rating_matrix.columns),
-                           'item_id': self.rating_matrix.columns})
+        watched_movies_id = self.rating_matrix.loc[user, self.rating_matrix.loc[user, :].notnull()].index
+        df = pd.DataFrame({'user_id': [user] * (len(self.rating_matrix.columns)-len(watched_movies_id)),
+                           'item_id': [movie for movie in self.rating_matrix.columns if
+                                       movie not in watched_movies_id]})
         prediction = self.predict(df) \
             .sort_values('predicted_rating', ascending=False) \
             .drop(['user_id'], axis=1) \
@@ -138,12 +138,17 @@ class ContentBasedModel(BaseModel):
         watched_movies = self.encoded_movies.merge(
             self.rating_df[self.rating_df.user_id == user_id][['item_id', 'rating']],
             how='inner', on='item_id')
+        print(watched_movies.head())
+        number_watched_movies = len(watched_movies)
         weights = watched_movies['rating'] / watched_movies.rating.sum()
         watched_movies.drop(['rating', 'item_id'], axis=1, inplace=True)
         mean_user_vector = watched_movies.mul(pd.Series(weights), axis=0).mean().to_list()
-        top_n = pd.DataFrame(
-            {'item_id': self.index.get_nns_by_vector(mean_user_vector, 10, include_distances=True)[0],
-             'distance': self.index.get_nns_by_vector(mean_user_vector, 10, include_distances=True)[1]})
+        ttl_recs = zip(
+            self.index.get_nns_by_vector(mean_user_vector, number_watched_movies + n, include_distances=True)[0],
+            self.index.get_nns_by_vector(mean_user_vector, number_watched_movies + n, include_distances=True)[1])
+        recs_matrix = [[movie, distance] for movie, distance in ttl_recs if
+                       movie not in self.rating_df[self.rating_df.user_id == user_id]['item_id']][:n]
+        top_n = pd.DataFrame(recs_matrix, columns=['item_id', 'distance'])
         return top_n
 
     def save_model(self):

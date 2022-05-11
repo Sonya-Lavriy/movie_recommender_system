@@ -1,3 +1,7 @@
 li:hover{
     text-decoration: underline;
 }
+
+.form-check-inline {
+    margin-left: -0.25rem;
+}

@@ -5,8 +5,28 @@ Personal recommendation
 {% endblock %}
 
 
+{% block main %}
+<li class="nav-item"><a href="/main" class="nav-link link-light px-4 active" aria-current="page">Main</a>
+</li>
+{% endblock %}
+
 {% block login %}
-<li class="nav-item"><a href="#" class="nav-link link-light px-2">User_{{user_id}}</a></li>
+<li class="nav-item"><a href="#" class="nav-link link-light px-2dropdown-toggle" data-bs-toggle="dropdown">User_{{user_id}}</a>
+</li>
+<div class="dropdown text-end">
+    <a href="#" class="d-block link-light text-decoration-none dropdown-toggle pt-2" id="dropdownUser1"
+       data-bs-toggle="dropdown" aria-expanded="false">
+    </a>
+    <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+        <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+        <li><a class="dropdown-item" href="/rated_films">Rated films</a></li>
+        <!--        <li><a class="dropdown-item" href="#">Profile</a></li>-->
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li><a class="dropdown-item" href="/">Sign out</a></li>
+    </ul>
+</div>
 {% endblock %}
 
 {% block personal_recs%}
@@ -20,12 +40,43 @@ Personal recommendation
 
 <div class="row justify-content-center">
     {% for movie in cf_recs %}
-    <div class="card" style="width: 15.5rem">
-        <!--        <img src="static\images\5.webp" class="card-img-top mt-1" alt="image">-->
+    <div class="card" style="width: 19rem">
         <div class="card-body">
-            <h5 class="card-title">{{movie[2]}}</h5>
-            <p class="card-text">Release date: <i>{{movie[3]}}</i></p>
-            <a href={{movie[4]}} class="btn btn-outline-success">Go to film</a>
+            <form action="" method="post">
+                <h5 class="card-title">{{movie[2]}}</h5>
+                <input type="hidden" name="id" value='{{movie[0]}}'>
+                <p class="card-text" name="release_date">Release date: <i>{{movie[3]}}</i></p>
+                <a href={{movie[4]}} class="btn btn-outline-success">Go to film</a>
+                <input class="btn btn-outline-info ms-2" type="submit" name="btn" value="Add to wishlist"/>
+                <div class="mt-2">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                               value="1">
+                        <label class="form-check-label" for="inlineRadio1">1</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
+                               value="2">
+                        <label class="form-check-label" for="inlineRadio2">2</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
+                               value="3">
+                        <label class="form-check-label" for="inlineRadio3">3</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio4"
+                               value="4">
+                        <label class="form-check-label" for="inlineRadio3">4</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio5"
+                               value="5">
+                        <label class="form-check-label" for="inlineRadio3">5</label>
+                    </div>
+                </div>
+                <input class="btn btn-outline-warning mt-1" type="submit" name="btn" value="Rate"/>
+            </form>
         </div>
     </div>
     {% endfor %}
@@ -38,12 +89,44 @@ Personal recommendation
 
 <div class="row justify-content-center">
     {% for movie in cb_recs %}
-    <div class="card" style="width: 15.5rem">
+    <div class="card" style="width: 19rem">
         <!--        <img src="static\images\5.webp" class="card-img-top mt-1" alt="image">-->
         <div class="card-body">
-            <h5 class="card-title">{{movie[2]}}</h5>
-            <p class="card-text">Release date: <i>{{movie[3]}}</i></p>
-            <a href={{movie[4]}} class="btn btn-outline-success">Go to film</a>
+            <form action="" method="post">
+                <h5 class="card-title">{{movie[2]}}</h5>
+                <input type="hidden" name="id" value='{{movie[0]}}'>
+                <p class="card-text" name="release_date">Release date: <i>{{movie[3]}}</i></p>
+                <a href={{movie[4]}} class="btn btn-outline-success">Go to film</a>
+                <input class="btn btn-outline-info ms-2" type="submit" name="btn" value="Add to wishlist"/>
+                <div class="mt-2">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio6"
+                               value="1">
+                        <label class="form-check-label" for="inlineRadio6">1</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio7"
+                               value="2">
+                        <label class="form-check-label" for="inlineRadio7">2</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio8"
+                               value="3">
+                        <label class="form-check-label" for="inlineRadio8">3</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio9"
+                               value="4">
+                        <label class="form-check-label" for="inlineRadio9">4</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio10"
+                               value="5">
+                        <label class="form-check-label" for="inlineRadio10">5</label>
+                    </div>
+                </div>
+                <input class="btn btn-outline-warning mt-1" type="submit" name="btn" value="Rate"/>
+            </form>
         </div>
     </div>
     {% endfor %}
