@@ -305,6 +305,25 @@ def wishlist():
         elif request.form['btn'] == 'Search':
             service.keyword = request.form['search_movie']
             return redirect('/search_result')
+        elif request.form['btn'] == 'Rate':
+            rating = int(request.form['inlineRadioOptions'])
+            print('rating is:', rating)
+            item_id = request.form['id']
+            print('rated was item with id: ', item_id)
+            timestamp = int(time.mktime(datetime.now().timetuple()))
+            print('rated timestamp: ', timestamp)
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                f'INSERT INTO ratings (user_id, item_id, rating, timestamp) VALUES ({service.uid}, {item_id}, {rating}, {timestamp} )')
+            conn.commit()
+            cur.execute(f'DELETE FROM wishlist WHERE user_id={service.uid} AND item_id={item_id}')
+            conn.commit()
+            count = cur.rowcount
+            print(count, "record inserted successfully into rating table")
+            cur.close()
+            conn.close()
+            return redirect(request.url)
 
 
 @app.route('/search_result', methods=['POST', 'GET'])
