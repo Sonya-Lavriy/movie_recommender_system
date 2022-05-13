@@ -11,16 +11,27 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content rounded-5 shadow">
             <div class="modal-header p-5 pb-4 border-bottom-0">
-                <form class="text-center">
-                    <div class="form-floating mb-3">
+                <form class="text-center" method="post">
+                    <div class="form-floating">
                         <h3>Welcome to our Recommender system!</h3><br>
                         <p>Your personal ID is {{ new_id }}.</p>
                         <p>Remember it to join us next time!</p><br>
                     </div>
+                    <input type="number" class="form-control rounded-4 mb-3" placeholder="Enter your age" name='age' id="age">
 
-                    <a class="w-100 mb-2 btn btn-lg rounded-4 btn-outline-success" role="button" href="/main">On main
-                        page</a>
-                    <hr class="my-4"><br>
+                    <select class="form-select mb-3" id="inputGroupSelect01" name="sex">
+                        <option selected>Choose your sex...</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+
+                    <input type="text" class="form-control mb-3" name="occupation" id="occupation" placeholder="Occupation">
+
+                    <input type="text" class="form-control mb-3" name='zip_code' id="zip_code" placeholder="Enter your zip code">
+
+                    <button class="w-100 btn btn-lg btn-success mb-4" type="submit">Sign up</button>
+                    <hr class="my-4">
+                    <br>
                     <p class="text-center txt-muted mb-0">© 2022 My Diploma</p>
                 </form>
             </div>

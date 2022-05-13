@@ -41,14 +41,41 @@ Search results
     {% if films|length!=0 %}
     {% for movie in films %}
     <div class="alert alert-secondary">
-        <form>
-            <h4>{{movie[0]}}</h4>
-            <input type="hidden" name="title" value='{{movie[2]}}'>
-            <p>Release date: <i>{{movie[1]}}</i></p>
+        <form method="post">
+            <input type="hidden" name="id" value='{{movie[0]}}'>
+            <h4>{{movie[1]}}</h4>
+            <p>Release date: <i>{{movie[2]}}</i></p>
             <div>
-                <a href={{movie[2]}} class="btn btn-success">Go to film</a>
-                <!--                <input class="btn btn-outline-white ms-3" name="btn" value="Add to wishlist"/>-->
-                <!--                <a class="btn btn-outline-white ms-3" href="/search_result">Add to wishlist</a>-->
+                <a href={{movie[3]}} class="btn btn-success">Go to film</a>
+                <input class="btn btn-outline-info ms-3" type="submit" name="btn" value="Add to wishlist"/>
+                <div class="mt-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio6"
+                               value="1">
+                        <label class="form-check-label" for="inlineRadio6">1</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio7"
+                               value="2">
+                        <label class="form-check-label" for="inlineRadio7">2</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio8"
+                               value="3">
+                        <label class="form-check-label" for="inlineRadio8">3</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio9"
+                               value="4">
+                        <label class="form-check-label" for="inlineRadio9">4</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio10"
+                               value="5">
+                        <label class="form-check-label" for="inlineRadio10">5</label>
+                    </div>
+                </div>
+                <input class="btn btn-warning mt-1" type="submit" name="btn" value="Rate"/>
             </div>
         </form>
     </div>

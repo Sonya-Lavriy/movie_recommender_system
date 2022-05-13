@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 
 {% block title %}
-Rated films
+Personal Recommendations
 {% endblock %}
 
 
@@ -20,7 +20,6 @@ Rated films
     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
         <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
         <li><a class="dropdown-item" href="/rated_films">Rated films</a></li>
-        <!--        <li><a class="dropdown-item" href="#">Profile</a></li>-->
         <li>
             <hr class="dropdown-divider">
         </li>
@@ -35,24 +34,12 @@ Rated films
 
 {% block body %}
 <div class='container ps-5 mb-4 mt-5'>
-    <h3>Already watched movies: </h3>
+    <h3>Personal Recommendations: </h3>
 </div>
 
 <div class="container mt-5">
-    {% if rated_films|length==0 %}
-    <h6>You haven't rate any film before...</h6>
-    {% else %}
-    {% for movie in rated_films %}
-    <div class="alert alert-secondary">
-        <!--        <img src="static\images\5.webp" class="card-img-top mt-1" alt="image">-->
-        <h4>{{movie[1]}}</h4>
-        <p>Release date: <i>{{movie[2]}}</i></p>
-<!--        <span class="heading">User Rating</span>-->
-        <p>Rating: {{movie[5]}}</p>
-        <a href={{movie[3]}} class="btn btn-success">Go to film</a>
-    </div>
-    {% endfor %}
-    {% endif %}
+    <p>It seems that we have no information about your preferences in movies :( <br>
+        Please, rate films, that you have watched before to get personal recommendations...</p>
 </div>
 
 {% endblock %}

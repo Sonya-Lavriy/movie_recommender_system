@@ -23,9 +23,9 @@ Search results
     {% if films|length!=0 %}
     {% for movie in films %}
     <div class="alert alert-secondary">
-        <h4>{{movie[0]}}</h4>
-        <p>Release date: <i>{{movie[1]}}</i></p>
-        <a href={{movie[2]}} class="btn btn-success">Go to film</a>
+        <h4>{{movie[1]}}</h4>
+        <p>Release date: <i>{{movie[2]}}</i></p>
+        <a href={{movie[3]}} class="btn btn-success">Go to film</a>
     </div>
     {% endfor %}
     {% else %}

@@ -70,17 +70,10 @@ def index():
         conn.close()
         return render_template("unloged_main_page.html", most_popular_movies=most_popular_movies,
                                most_rated_movies=most_rated_movies)
-    if request.method == 'POST':
+    else:
         if request.form['btn'] == 'Search':
-            movie_title = request.form['search_movie']
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(
-                f"SELECT title, release_date, imdb_url_new FROM full_movies WHERE lower(title) like '%{movie_title}%'")
-            result = cur.fetchall()
-            cur.close()
-            conn.close()
-            return render_template('unloged_search_result.html', films=result)
+            service.keyword = request.form['search_movie']
+            return redirect('/unloged_search_result')
 
 
 @app.route('/main', methods=['POST', 'GET'])
@@ -113,16 +106,8 @@ def main():
             conn.close()
             return redirect(request.url)
         elif request.form['btn'] == 'Search':
-            # return redirect('/search_result')
-            item_id = request.form['id']
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(
-                f"SELECT title, release_date, imdb_url_new FROM full_movies WHERE item_id={item_id}")
-            result = cur.fetchall()
-            cur.close()
-            conn.close()
-            return render_template('loged_search_result.html', user_id=service.uid, films=result)
+            service.keyword = request.form['search_movie']
+            return redirect('/search_result')
         elif request.form['btn'] == 'Rate':
             print('Film is rated')
             rating = int(request.form['inlineRadioOptions'])
@@ -166,51 +151,81 @@ def login():
         return render_template("login.html")
 
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users order by user_id desc limit 1")
-    max_id_user = cur.fetchall()
-    service.uid = max_id_user[0][0] + 1
-    cur.close()
-    conn.close()
-    return render_template("signup.html", new_id=service.uid)
+    if request.method == 'GET':
+        print('You open page')
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users order by user_id desc limit 1")
+        max_id_user = cur.fetchall()
+        service.uid = max_id_user[0][0] + 1
+        cur.close()
+        conn.close()
+        return render_template("signup.html", new_id=service.uid)
+    elif request.method == 'POST':
+        print('You send form')
+        age = int(request.form['age'])
+        print(age)
+        sex = request.form.get('sex')
+        print(sex)
+        occupation = request.form.get('occupation')
+        print(occupation)
+        zip_code = request.form.get('zip_code')
+        print(zip_code)
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users order by user_id desc limit 1")
+        max_id_user = cur.fetchall()
+        service.uid = max_id_user[0][0] + 1
+        cur.execute(
+            f"INSERT INTO users (user_id, age, gender, occupation, zip_code) VALUES ({service.uid}, {age}, '{sex}', '{occupation}', '{zip_code}')")
+        conn.commit()
+        cur.close()
+        conn.close()
+        print('User successfully added')
+        return redirect('/main')
 
 
 @app.route('/pers_recs', methods=['POST', 'GET'])
 def personal_recs():
     if request.method == 'GET':
-        cf_recs_df = service.cf_model.top_n(service.uid, 10)
-        cf_recs_id = tuple(cf_recs_df['item_id'])
-        # print(recs_df.shape)
-
-        cb_recs_df = service.cb_model.top_n(service.uid, 10)
-        cb_recs_id = tuple(cb_recs_df['item_id'])
-        print(cb_recs_id)
-
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute(
-            f"SELECT item_id, title, release_date, imdb_url_new, poster_url FROM full_movies WHERE item_id in {cf_recs_id}")
-        cf_movies_info = pd.DataFrame(cur.fetchall())
-        cf_movies_info.columns = ['item_id', 'title', 'release_date', 'imdb_url', 'poster_url']
-        # print(movies_info.shape)
+        cur.execute(f'SELECT * FROM ratings where user_id={service.uid}')
+        res = cur.fetchall()
+        if len(res) == 0:
+            return redirect('/unfound_pers_recs')
+        else:
+            cf_recs_df = service.cf_model.top_n(service.uid, 10)
+            cf_recs_id = tuple(cf_recs_df['item_id'])
+            # print(recs_df.shape)
 
-        cur.execute(
-            f"SELECT item_id, title, release_date, imdb_url_new, poster_url FROM full_movies WHERE item_id in {cb_recs_id}")
-        cb_movies_info = pd.DataFrame(cur.fetchall())
-        cb_movies_info.columns = ['item_id', 'title', 'release_date', 'imdb_url', 'poster_url']
-        print(cb_movies_info)
+            cb_recs_df = service.cb_model.top_n(service.uid, 10)
+            cb_recs_id = tuple(cb_recs_df['item_id'])
+            print(cb_recs_id)
 
-        cf_top_n_df = cf_recs_df.merge(cf_movies_info, how='inner', on='item_id')
-        cb_top_n_df = cb_recs_df.merge(cb_movies_info, how='inner', on='item_id')
-        print(cb_top_n_df)
+            cur.execute(
+                f"SELECT item_id, title, release_date, imdb_url_new, poster_url FROM full_movies WHERE item_id in {cf_recs_id}")
+            cf_movies_info = pd.DataFrame(cur.fetchall())
+            cf_movies_info.columns = ['item_id', 'title', 'release_date', 'imdb_url', 'poster_url']
+            # print(movies_info.shape)
 
-        cur.close()
-        conn.close()
-        return render_template('personal_recs.html', user_id=service.uid, cf_recs=cf_top_n_df.values.tolist(),
-                               cb_recs=cb_top_n_df.values.tolist())
+            cur.execute(
+                f"SELECT item_id, title, release_date, imdb_url_new, poster_url FROM full_movies WHERE item_id in {cb_recs_id}")
+            cb_movies_info = pd.DataFrame(cur.fetchall())
+            cb_movies_info.columns = ['item_id', 'title', 'release_date', 'imdb_url', 'poster_url']
+            print(cb_movies_info)
+
+            cf_top_n_df = cf_recs_df.merge(cf_movies_info, how='inner', on='item_id')
+            cb_top_n_df = cb_recs_df.merge(cb_movies_info, how='inner', on='item_id')
+            print(cb_top_n_df)
+
+            cur.close()
+            conn.close()
+            return render_template('personal_recs.html', user_id=service.uid, cf_recs=cf_top_n_df.values.tolist(),
+                                   cb_recs=cb_top_n_df.values.tolist())
     elif request.method == 'POST':
         if request.form['btn'] == 'Add to wishlist':
             item_id = request.form['id']
@@ -241,43 +256,114 @@ def personal_recs():
             cur.close()
             conn.close()
             return redirect(request.url)
+        elif request.form['btn'] == 'Search':
+            service.keyword = request.form['search_movie']
+            return redirect('/search_result')
 
 
-@app.route('/rated_films')
+@app.route('/rated_films', methods=['POST', 'GET'])
 def rated_films():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        f"SELECT distinct ratings.item_id, title, release_date, imdb_url_new, poster_url, rating, ratings.timestamp FROM ratings left join full_movies on (ratings.item_id=full_movies.item_id) WHERE ratings.user_id = {service.uid} order by ratings.timestamp desc")
-    result = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('rated_films.html', user_id=service.uid, rated_films=result)
+    if request.method == 'GET':
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            f"SELECT distinct ratings.item_id, title, release_date, imdb_url_new, poster_url, rating, ratings.timestamp FROM ratings left join full_movies on (ratings.item_id=full_movies.item_id) WHERE ratings.user_id = {service.uid} order by ratings.timestamp desc")
+        result = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('rated_films.html', user_id=service.uid, rated_films=result)
+    else:
+        if request.form['btn'] == 'Search':
+            service.keyword = request.form['search_movie']
+            return redirect('/search_result')
 
 
-@app.route('/wishlist')
+@app.route('/wishlist', methods=['POST', 'GET'])
 def wishlist():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        f'SELECT distinct wishlist.item_id, title, release_date, imdb_url_new, datetime FROM wishlist inner join full_movies on (wishlist.item_id=full_movies.item_id) WHERE user_id={service.uid} ORDER BY datetime desc')
-    result = cur.fetchall()
-    cur.close()
-    conn.close()
-    return render_template('wishlist.html', user_id=service.uid, wishlist=result)
+    if request.method == 'GET':
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            f'SELECT distinct wishlist.item_id, title, release_date, imdb_url_new, datetime FROM wishlist inner join full_movies on (wishlist.item_id=full_movies.item_id) WHERE user_id={service.uid} ORDER BY datetime desc')
+        result = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('wishlist.html', user_id=service.uid, wishlist=result)
+    else:
+        if request.form['btn'] == 'Delete':
+            print('Delete request')
+            movie_id = request.form['id']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                f'DELETE FROM wishlist WHERE user_id={service.uid} AND item_id={movie_id}')
+            conn.commit()
+            print('Row deleted')
+            cur.close()
+            conn.close()
+            return redirect(request.url)
+        elif request.form['btn'] == 'Search':
+            service.keyword = request.form['search_movie']
+            return redirect('/search_result')
 
 
-@app.route('/search_result')
+@app.route('/search_result', methods=['POST', 'GET'])
 def search():
-    movie_title = request.form['search_movie']
+    if request.method == 'GET':
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            f"SELECT item_id, title, release_date, imdb_url_new FROM full_movies WHERE lower(title) like '%{service.keyword}%'")
+        result = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('loged_search_result.html', user_id=service.uid, films=result)
+    else:
+        if request.form['btn'] == 'Add to wishlist':
+            item_id = request.form['id']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                f'INSERT INTO wishlist (user_id, item_id, datetime, from_recommendations) VALUES ({service.uid}, {item_id}, current_date, FALSE )')
+            conn.commit()
+            count = cur.rowcount
+            print(count, "Record inserted successfully into wishlist table")
+            cur.close()
+            conn.close()
+            return redirect(request.url)
+        elif request.form['btn'] == 'Rate':
+            rating = int(request.form['inlineRadioOptions'])
+            print('rating is:', rating)
+            item_id = request.form['id']
+            print('rated was item with id: ', item_id)
+            timestamp = int(time.mktime(datetime.now().timetuple()))
+            print('rated timestamp: ', timestamp)
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                f'INSERT INTO ratings (user_id, item_id, rating, timestamp) VALUES ({service.uid}, {item_id}, {rating}, {timestamp} )')
+            conn.commit()
+            count = cur.rowcount
+            print(count, "record inserted successfully into rating table")
+            cur.close()
+            conn.close()
+            return redirect(request.url)
+
+@app.route('/unloged_search_result')
+def unloged_search():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute(
-        f"SELECT title, release_date, imdb_url_new FROM full_movies WHERE lower(title) like '%{movie_title}%'")
+        f"SELECT item_id, title, release_date, imdb_url_new FROM full_movies WHERE lower(title) like '%{service.keyword}%'")
     result = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('search_result.html', user_id=service.uid, films=result)
+    return render_template('unloged_search_result.html', films=result)
+
+
+@app.route('/unfound_pers_recs')
+def unfound_pers_recs():
+    return render_template('unfound_pers_recs.html', user_id=service.uid)
 
 
 if __name__ == '__main__':

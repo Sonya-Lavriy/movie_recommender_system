@@ -39,16 +39,19 @@ wishlist
 
 <div class="container mt-5">
     {% if wishlist|length!=0 %}
-        {% for movie in wishlist %}
-        <div class="alert alert-secondary">
-            <!--        <img src="static\images\5.webp" class="card-img-top mt-1" alt="image">-->
+    {% for movie in wishlist %}
+    <div class="alert alert-secondary">
+        <form method="post" action="">
+            <input type="hidden" name="id" value={{movie[0]}}>
             <h4>{{movie[1]}}</h4>
             <p>Release date: <i>{{movie[2]}}</i></p>
             <a href={{movie[3]}} class="btn btn-success">Go to film</a>
-        </div>
-        {% endfor %}
+            <input class="btn btn-outline-danger ms-2" name="btn" type="submit" value="Delete">
+        </form>
+    </div>
+    {% endfor %}
     {% else %}
-        <h6>No movies in wishlist :( </h6>
+    <h6>No movies in wishlist :( </h6>
     {% endif %}
 </div>
 
